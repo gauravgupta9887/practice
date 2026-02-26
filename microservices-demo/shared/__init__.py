@@ -1,0 +1,1 @@
+# nothing needed – placeholder to make `shared` a package
