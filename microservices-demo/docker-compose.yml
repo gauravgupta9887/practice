@@ -1,0 +1,89 @@
+version: "3.9"
+
+services:
+  # PostgreSQL database
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: microservices_demo
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # User service
+  user_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: user
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/microservices_demo
+      JWT_SECRET_KEY: super-secret-key
+    depends_on:
+      - db
+    ports:
+      - "8081:8081"
+
+  # Inventory service
+  inventory_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: inventory
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/microservices_demo
+      JWT_SECRET_KEY: super-secret-key
+    depends_on:
+      - db
+    ports:
+      - "8082:8082"
+
+  # Order service
+  order_service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: order
+    environment:
+      DATABASE_URL: postgres://postgres:postgres@db:5432/microservices_demo
+      JWT_SECRET_KEY: super-secret-key
+    depends_on:
+      - db
+    ports:
+      - "8083:8083"
+
+  # API Gateway
+  api_gateway:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: gateway
+    environment:
+      JWT_SECRET_KEY: super-secret-key
+    depends_on:
+      - user_service
+      - inventory_service
+      - order_service
+    ports:
+      - "8000:8000"
+
+  # Airflow (only the DAG part; no DB here)
+  airflow:
+    image: apache/airflow:2.8.0
+    environment:
+      AIRFLOW__CORE__EXECUTOR: LocalExecutor
+      AIRFLOW__CORE__FERNET_KEY: Z0pKj8lZ6h1R2b3T4u5V6wX7y8Z9a0B
+      AIRFLOW__CORE__LOAD_EXAMPLES: "false"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+    ports:
+      - "8080:8080"
+    command: ["webserver"]
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
