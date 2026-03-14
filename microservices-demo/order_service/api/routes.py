@@ -6,13 +6,16 @@ from .shared.logger import logger
 
 bp = Blueprint("order", __name__, url_prefix="/api/order")
 
+
 def get_db():
     from .shared.db import SessionLocal
+
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
 
 @bp.route("/orders", methods=["POST"])
 @jwt_required()
@@ -25,4 +28,4 @@ def create_order():
         return jsonify(order.dict()), 201
     except Exception as e:
         logger.exception("order create error")
-        return jsonify({"msg":"server error"}), 500
+        return jsonify({"msg": "server error"}), 500

@@ -10,7 +10,7 @@ def func1():
 
 def func2():
     for i in range(5):
-        time.sleep(.8)
+        time.sleep(0.8)
         print("Inside func 2")
 
 

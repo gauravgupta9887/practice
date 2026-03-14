@@ -12,7 +12,7 @@ class CheesePizza(Pizza):
 
 class PepperoniPizza(Pizza):
     def prepare(self):
-        return "Preparing Pepperoni Pizza"   
+        return "Preparing Pepperoni Pizza"
 
 
 class VeggiePizza(Pizza):
@@ -24,7 +24,7 @@ def main():
     # Manually creating pizza objects
     pizza1 = CheesePizza()
     pizza2 = PepperoniPizza()
-    pizza3 = VeggiePizza()   
+    pizza3 = VeggiePizza()
     print(pizza1.prepare())
     print(pizza2.prepare())
     print(pizza3.prepare())
@@ -32,7 +32,7 @@ def main():
 
 main()
 # eg to learn :- pizza shop having a chef who takes the name and give the pizza
-# 1. tightly coupled :- what if I want to discontinue 1 pizza, what if I want 
+# 1. tightly coupled :- what if I want to discontinue 1 pizza, what if I want
 # to rename?
 # 2. If we add more pizzas, we will keep on adding if and else
 # 3. very hard to scale
@@ -64,7 +64,7 @@ class PizzaFactory:
         elif pizza_type == "veggie":
             return VeggiePizza()
         elif pizza_type == "cheese":
-            return CheesePizza() 
+            return CheesePizza()
         else:
             raise ValueError("Unknown pizza type: {pizza_type}")
 

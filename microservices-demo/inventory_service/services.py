@@ -3,6 +3,7 @@ from .models import Product
 from .schemas import ProductCreate, ProductResponse
 from .shared.logger import logger
 
+
 class InventoryService:
     def __init__(self, db: Session):
         self.db = db

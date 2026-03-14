@@ -5,7 +5,7 @@ class BankService:
         print(f"Processing payment of ${amount} through Bankservice")
 
 
-# Interface 
+# Interface
 class PaymentService:
     def pay(self, amount):
         pass
@@ -15,12 +15,12 @@ class PaymentService:
 class BankServiceAdapter(PaymentService):
     def __init__(self, bank_service: BankService):
         self.bank_service = bank_service
-    
+
     def pay(self, amount):
         self.bank_service.make_payment(amount)
 
 
-# Client code: expects a 'pay(amount)' method  
+# Client code: expects a 'pay(amount)' method
 def process_payment(payment_service, amount):
     payment_service.pay(amount)
 
@@ -28,7 +28,7 @@ def process_payment(payment_service, amount):
 bank_service = BankService()
 process_payment(bank_service, 100)  # This throw an error
 
-# but we can not modify the main bankservice because what if it is coming from 
+# but we can not modify the main bankservice because what if it is coming from
 # third party
 bank_service_adapter = BankServiceAdapter(BankService)
 process_payment(bank_service_adapter, 100)  # This throw an error

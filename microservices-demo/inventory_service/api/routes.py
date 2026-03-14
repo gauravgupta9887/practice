@@ -6,13 +6,16 @@ from .shared.logger import logger
 
 bp = Blueprint("inventory", __name__, url_prefix="/api/inventory")
 
+
 def get_db():
     from .shared.db import SessionLocal
+
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
 
 @bp.route("/products", methods=["POST"])
 @jwt_required()
@@ -26,7 +29,8 @@ def create_product():
         return jsonify({"msg": str(e)}), 400
     except Exception as e:
         logger.exception("inventory create error")
-        return jsonify({"msg":"server error"}), 500
+        return jsonify({"msg": "server error"}), 500
+
 
 @bp.route("/products/<int:prod_id>", methods=["GET"])
 @jwt_required()
@@ -34,5 +38,5 @@ def get_product(prod_id):
     svc = InventoryService(next(get_db()))
     prod = svc.get_product(prod_id)
     if not prod:
-        return jsonify({"msg":"not found"}), 404
+        return jsonify({"msg": "not found"}), 404
     return jsonify(prod.dict())

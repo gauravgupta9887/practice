@@ -6,13 +6,16 @@ from .shared.logger import logger
 
 bp = Blueprint("user", __name__, url_prefix="/api/users")
 
+
 def get_db():
     from .shared.db import SessionLocal
+
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
+
 
 @bp.route("/register", methods=["POST"])
 def register():
@@ -27,6 +30,7 @@ def register():
         logger.exception("register error")
         return jsonify({"msg": "server error"}), 500
 
+
 @bp.route("/login", methods=["POST"])
 def login():
     try:
@@ -40,18 +44,13 @@ def login():
         logger.exception("login error")
         return jsonify({"msg": "server error"}), 500
 
+
 @bp.route("/profile", methods=["GET"])
 @jwt_required()
 def profile():
     from flask_jwt_extended import get_jwt_identity
+
     user_id = get_jwt_identity()
     svc = UserService(next(get_db()))
     user = svc.db.query(User).filter(User.id == user_id).first()
     return jsonify(UserResponse.from_orm(user).dict())
-
-
-
-
-    
-
-    

@@ -7,14 +7,14 @@ import asyncio
 app = FastAPI()
 
 
-@app.get('/')
+@app.get("/")
 def root():
     return {"message": "Hello World"}
 
 
 @app.get("/courses/{course_name}")
 def read_course(course_name):
-    return {'course_name': course_name}
+    return {"course_name": course_name}
 
 
 @app.get("/course-id/{course_id}")
@@ -22,13 +22,18 @@ def read_course_id(course_id: int):
     return {"course_id": course_id}
 
 
-course_items = [{"course_name": "Python"}, {"course_name": "NodeJS"},
-                {"course_name": "Machine Learning"}]
+course_items = [
+    {"course_name": "Python"},
+    {"course_name": "NodeJS"},
+    {"course_name": "Machine Learning"},
+]
 
 
 @app.get("/courses/")
 def read_courses(start: int = 0, end: int = len(course_items)):
-    return course_items[start: start + end]
+    return course_items[start : start + end]
+
+
 # You can also use the other operations instead of GET:
 
 
@@ -37,6 +42,7 @@ def read_course_by_id(course_id: int, q: Optional[str] = None):
     if q is not None:
         return {"course_name": course_items[course_id], "q": q}
     return {"course_name": course_items[course_id]}
+
 
 # pydantics example
 
@@ -59,7 +65,7 @@ def write_notification(email: str, message=""):
         email_file.write(content)
 
 
-@app.post('/send-notification/{email}')
+@app.post("/send-notification/{email}")
 def send_notification(email: str, background_tasks: BackgroundTasks):
     background_tasks.add_task(write_notification, email, message="send_  \
                               notification")
@@ -86,6 +92,8 @@ async def func1():
 async def func2():
     await asyncio.sleep(1)
     return "Func2() Completed"
+
+
 # @app.post() can be used if you want the client application to access the
 #  route in a POST manner.
 # @app.put() can be used if you want the client application to access the

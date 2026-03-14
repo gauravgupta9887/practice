@@ -7,6 +7,7 @@ app.config["JWT_SECRET_KEY"] = "super-secret-key"
 
 jwt = JWTManager(app)
 
+
 def forward():
     path = request.full_path
     method = request.method
@@ -20,10 +21,11 @@ def forward():
     elif request.path.startswith("/api/order"):
         target = "http://order_service:8083" + request.path
     else:
-        return jsonify({"msg":"unknown endpoint"}), 404
+        return jsonify({"msg": "unknown endpoint"}), 404
 
     r = requests.request(method, target, headers=headers, json=data, timeout=5)
     return (r.content, r.status_code, r.headers.items())
+
 
 app.add_url_rule("/", defaults={"path": ""}, view_func=forward, methods=["GET"])
 app.add_url_rule("/<path:path>", view_func=forward)

@@ -4,6 +4,7 @@ from .api.routes import bp
 from .shared.db import init_db
 from .shared.jwt import init_jwt
 
+
 def create_app():
     app = Flask(__name__)
     settings = get_settings()
@@ -14,6 +15,7 @@ def create_app():
 
     app.register_blueprint(bp)
     return app
+
 
 if __name__ == "__main__":
     app = create_app()

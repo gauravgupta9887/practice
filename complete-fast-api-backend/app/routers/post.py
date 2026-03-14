@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import Response, status, HTTPException, APIRouter
 from fastapi.params import Depends
@@ -15,9 +15,15 @@ router = APIRouter(prefix="/sqlalchemy/posts", tags=["Posts"])
 @router.get("", response_model=List[PostResponse])
 async def get_sqlalchemy_posts(
     db: Session = Depends(get_db),
-    current_user: int = Depends(get_current_user)
+    current_user: int = Depends(get_current_user),
+    limit: int = 10,
+    skip: int = 0,
+    search: Optional[str] = ""
 ):
-    posts = db.query(models.Post).all()
+    posts = db.query(models.Post) \
+              .filter(models.Post.user_id == current_user.id) \
+              .filter(models.Post.title.contains(search)) \
+              .limit(limit).offset(skip)
     return posts
 
 
@@ -34,8 +40,7 @@ def create_new_sql_post(
     post_dict = post.dict()
     post_dict.pop("rating", None)
     # adding user
-    post_dict["user_id"] = current_user.id
-    new_post = models.Post(**post_dict)
+    new_post = models.Post(user_id=current_user.id, **post_dict)
     db.add(new_post)
     db.commit()
     db.refresh(new_post)
@@ -74,10 +79,18 @@ def delete_sqlalchemy_post(
     # post_index = find_post_index(id)
     deleted_query = db.query(models.Post).filter(models.Post.id == id)
 
+    delete_post = deleted_query.first()
+
     if deleted_query.first() is None:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"post with id: {id} was not found",
+        )
+
+    if delete_post.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to perform requested action",
         )
     # my_posts.pop(post_index)
     deleted_query.delete(synchronize_session=False)
@@ -106,6 +119,11 @@ def sql_update_post(
             detail=f"post with id: {id} was not found",
         )
 
+    if post_res.user_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Not authorized to perform requested action",
+        )
     update_query.update(post_dict, synchronize_session=False)
     db.commit()
     # post_dict = post.dict()

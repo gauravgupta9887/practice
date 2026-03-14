@@ -9,7 +9,7 @@ def write_notification(email: str, message=""):
         email_file.write(content)
 
 
-@app.post('/send-notification/{email}')
+@app.post("/send-notification/{email}")
 def send_notification(email: str, background_tasks: BackgroundTasks):
     background_tasks.add_task(write_notification, email, message="send_  \
                               notification")
