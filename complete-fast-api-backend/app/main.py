@@ -20,6 +20,15 @@ app.include_router(post.router)
 app.include_router(user.router)
 app.include_router(auth.router)
 
+# Our actual main file is till here only and imports are also not needed
+#
+#
+#
+#
+#
+#
+#
+#
 
 # made it obselete
 while True:

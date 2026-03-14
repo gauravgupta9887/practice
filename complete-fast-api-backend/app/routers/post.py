@@ -18,17 +18,19 @@ async def get_sqlalchemy_posts(
     current_user: int = Depends(get_current_user),
     limit: int = 10,
     skip: int = 0,
-    search: Optional[str] = ""
+    search: Optional[str] = "",
 ):
-    posts = db.query(models.Post) \
-              .filter(models.Post.user_id == current_user.id) \
-              .filter(models.Post.title.contains(search)) \
-              .limit(limit).offset(skip)
+    posts = (
+        db.query(models.Post)
+        .filter(models.Post.user_id == current_user.id)
+        .filter(models.Post.title.contains(search))
+        .limit(limit)
+        .offset(skip)
+    )
     return posts
 
 
-@router.post("", status_code=status.HTTP_201_CREATED,
-             response_model=PostResponse)
+@router.post("", status_code=status.HTTP_201_CREATED, response_model=PostResponse)
 def create_new_sql_post(
     post: PostCreate,
     db: Session = Depends(get_db),
