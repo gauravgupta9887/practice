@@ -1,18 +1,19 @@
 from typing import List, Optional
 
-from fastapi import Response, status, HTTPException, APIRouter
-from fastapi.params import Depends
-from sqlalchemy.orm import Session
-
 import app.models as models
 from app.database import get_db
-from app.schemas import PostCreate, PostResponse
 from app.oauth2 import get_current_user
+from app.schemas import PostCreate, PostOut, PostResponse
+from fastapi import APIRouter, HTTPException, Response, status
+from fastapi.params import Depends
+from sqlalchemy import func
+from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/sqlalchemy/posts", tags=["Posts"])
 
 
-@router.get("", response_model=List[PostResponse])
+# @router.get("", response_model=List[PostResponse])
+@router.get("", response_model=List[PostOut])
 async def get_sqlalchemy_posts(
     db: Session = Depends(get_db),
     current_user: int = Depends(get_current_user),
@@ -27,7 +28,20 @@ async def get_sqlalchemy_posts(
         .limit(limit)
         .offset(skip)
     )
-    return posts
+
+    results = (
+        db.query(models.Post, func.count(models.Votes.post_id).label("votes"))
+        .join(models.Votes, models.Post.id == models.Votes.post_id, isouter=True)
+        .filter(models.Post.user_id == current_user.id)
+        .filter(models.Post.title.contains(search))
+        .group_by(models.Post.id)
+        .limit(limit)
+        .offset(skip)
+    )
+
+    print(posts)
+    # return posts
+    return [row._asdict() for row in results]
 
 
 @router.post("", status_code=status.HTTP_201_CREATED, response_model=PostResponse)
@@ -53,13 +67,20 @@ def create_new_sql_post(
 # title sr, content str
 
 
-@router.get("/{id}", response_model=PostResponse)
+@router.get("/{id}", response_model=PostOut)
 def get_sqlalchemy_post(
     id: int,
     db: Session = Depends(get_db),
     current_user: int = Depends(get_current_user),
 ):
-    test_post = db.query(models.Post).filter(models.Post.id == id).first()
+    test_post = (
+        db.query(models.Post, func.count(models.Votes.post_id).label("votes"))
+        .join(models.Votes, models.Post.id == models.Votes.post_id, isouter=True)
+        .filter(models.Post.user_id == current_user.id)
+        .filter(models.Post.id == id)
+        .group_by(models.Post.id)
+        .first()
+    )
     # cursor.execute("""SELECT * FROM posts where id=%s""", (str(id),))
     # test_post = cursor.fetchone()
     # post = find_post(id)

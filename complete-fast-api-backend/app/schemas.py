@@ -1,6 +1,7 @@
-from pydantic import BaseModel, EmailStr
-from typing import Optional
 from datetime import datetime
+from typing import Annotated, Optional
+
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserCreate(BaseModel):
@@ -70,4 +71,27 @@ class PostResponse(PostBase):
     user: UserOut
 
     class Config:
-        orm_mode = True
+        from_attributes = True
+
+
+class Vote(BaseModel):
+    post_id: int
+    dir: Annotated[int, Field(strict=True, ge=0, le=1)]
+
+
+class BasePost(BaseModel):
+    id: int
+    title: str
+    content: str
+    published: bool
+    created_at: datetime
+    user_id: int
+    user: UserOut
+
+    class Config:
+        from_attributes = True  # Required for Pydantic v2 to work with ORM obj
+
+
+class PostOut(BaseModel):
+    Post: BasePost
+    votes: int

@@ -1,7 +1,6 @@
-from sqlalchemy import create_engine
-
-from sqlalchemy.orm import sessionmaker
 from app.config import settings
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 # SQLALCHEMY_DATABASE_URL = 'postgres://<username>:<password>@<ip-address/
 # hostname>/<database_name'

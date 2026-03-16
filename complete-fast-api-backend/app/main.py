@@ -1,17 +1,17 @@
-from fastapi import FastAPI, Response, status, HTTPException
-from fastapi.params import Body, Depends
-from random import randrange
-import psycopg2
-from psycopg2.extras import RealDictCursor
 import time
+from random import randrange
+
+import psycopg2
+from app.database import get_db
+from app.routers import auth, post, user, vote
+from app.schemas import Post
+from fastapi import FastAPI, HTTPException, Response, status
+from fastapi.params import Body, Depends
+from psycopg2.extras import RealDictCursor
+from sqlalchemy.orm import Session
+
 from . import models
 from .database import engine
-from sqlalchemy.orm import Session
-from app.database import get_db
-
-from app.schemas import Post
-from app.routers import post, user, auth
-from app.config import settings
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -20,6 +20,7 @@ app = FastAPI()
 app.include_router(post.router)
 app.include_router(user.router)
 app.include_router(auth.router)
+app.include_router(vote.router)
 
 # Our actual main file is till here only and imports are also not needed
 #

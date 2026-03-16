@@ -1,8 +1,8 @@
+from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Boolean, ForeignKey
 from sqlalchemy.orm import relationship
-from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
+from sqlalchemy.sql.sqltypes import TIMESTAMP
 
 Base = declarative_base()
 
@@ -38,4 +38,30 @@ class Users(Base):
     password = Column(String, nullable=False)
     created_at = Column(
         TIMESTAMP(timezone=True), nullable=False, server_default=text("NOW()")
+    )
+
+
+class Votes(Base):
+    __tablename__ = "votes"
+    post_id = Column(
+        Integer,
+        ForeignKey(
+            "posts.id",
+            onupdate="NO ACTION",
+            on_delete="CASCADE",
+            name="votes_post_fkey",
+        ),
+        primary_key=True,
+        nullable=False,
+    )
+    user_id = Column(
+        Integer,
+        ForeignKey(
+            "users.id",
+            onupdate="NO ACTION",
+            on_delete="CASCADE",
+            name="votes_user_fkey",
+        ),
+        primary_key=True,
+        nullable=False,
     )
