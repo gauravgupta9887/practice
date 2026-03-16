@@ -11,9 +11,10 @@ from psycopg2.extras import RealDictCursor
 from sqlalchemy.orm import Session
 
 from . import models
-from .database import engine
 
-models.Base.metadata.create_all(bind=engine)
+# from .database import engine
+# This is not needed as we have done the creation already with alembic
+# models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
