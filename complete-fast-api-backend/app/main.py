@@ -7,7 +7,9 @@ from app.routers import auth, post, user, vote
 from app.schemas import Post
 from fastapi import FastAPI, HTTPException, Response, status
 from fastapi.params import Body, Depends
+from fastapi.middleware.cors import CORSMiddleware
 from psycopg2.extras import RealDictCursor
+
 from sqlalchemy.orm import Session
 
 from . import models
@@ -17,6 +19,16 @@ from . import models
 # models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(post.router)
 app.include_router(user.router)
